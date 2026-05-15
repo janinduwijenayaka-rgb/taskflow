@@ -1,0 +1,527 @@
+/*
+================================================================
+  TASKFLOW - STYLE.CSS
+  
+  CSS කියන්නේ HTML elements ට "look" දෙන file එක.
+  
+  Structure:
+  1. CSS Variables (color/font settings - එකම තැනින් control)
+  2. Reset & Base (browser default styles clear කරනවා)
+  3. Layout (app wrapper, main container)
+  4. Header
+  5. Progress Bar
+  6. Stats Grid
+  7. Add Form
+  8. Kanban Board
+  9. Task Cards
+  10. Badges
+  11. Buttons
+  12. Responsive (mobile support)
+================================================================
+*/
+
+
+/* ================================================================
+   SECTION 1: CSS VARIABLES (Custom Properties)
+   
+   ":root" = document ේ top level. මෙතන define කරපු variables
+   file ේ ඕනෙම තැනකදී var(--variable-name) විදිහට use කරන්න පුළුවන්.
+   
+   ඇයි variables? → color change කරන්න ඕනෙනම් එකම තැනක් හරි.
+   Hard-coded (#1a1a2e) 50 තැන දැම්මොත් change කරන්න nightmare.
+================================================================ */
+
+:root {
+  /* --- Colors --- */
+  --color-bg-page:      #f4f3ef;   /* page background (light cream) */
+  --color-bg-app:       #ffffff;   /* main app card background */
+  --color-bg-col:       #f7f6f2;   /* kanban column background */
+  --color-bg-card:      #ffffff;   /* task card background */
+
+  --color-text-primary:   #1c1c1c; /* main text (near black) */
+  --color-text-secondary: #6b6b6b; /* muted text (gray) */
+  --color-text-hint:      #a0a0a0; /* placeholder / hint text */
+
+  --color-border:         #e5e4df; /* default border color */
+  --color-border-strong:  #c8c7c0; /* hover / focused border */
+
+  /* Semantic colors (priority / status) */
+  --color-green-bg:   #eaf3de;
+  --color-green-text: #3b6d11;
+  --color-amber-bg:   #faeeda;
+  --color-amber-text: #854f0b;
+  --color-red-bg:     #fcebeb;
+  --color-red-text:   #a32d2d;
+
+  /* Progress bar fill */
+  --color-progress: #639922;
+
+  /* --- Typography --- */
+  --font-main: 'DM Sans', sans-serif;
+
+  /* --- Spacing --- */
+  --gap-sm:  8px;
+  --gap-md:  16px;
+  --gap-lg:  24px;
+
+  /* --- Border Radius --- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* --- Transitions --- */
+  --transition: 0.15s ease;
+}
+
+
+/* ================================================================
+   SECTION 2: RESET & BASE STYLES
+   
+   Browsers (Chrome, Firefox...) ට default styles තියෙනවා.
+   උදා: <h1> ට margin, <button> ට border etc.
+   "Reset" කියන්නේ ඒවා clear කරලා clean slate ගන්නේ.
+   
+   * selector = සියලු elements ට apply වෙනවා.
+================================================================ */
+
+/* Universal reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box; /* padding/border width calculation ට include කරනවා */
+  margin: 0;
+  padding: 0;
+}
+
+/* Base body styles */
+body {
+  font-family: var(--font-main);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-page);
+  /* Smooth font rendering (Mac/Windows) */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Remove default list styles */
+ul, ol {
+  list-style: none;
+}
+
+/* Remove default button styles */
+button {
+  font-family: inherit; /* body font use කරනවා */
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Input/select default font fix */
+input,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+
+/* ================================================================
+   SECTION 3: LAYOUT
+   
+   .app-wrapper → full page, centering
+   .app → max-width container (content ේිidth limit)
+================================================================ */
+
+/* Full page wrapper - content center කරනවා */
+.app-wrapper {
+  min-height: 100vh;     /* viewport height 100% */
+  padding: var(--gap-lg);
+  display: flex;
+  justify-content: center; /* horizontal center */
+  align-items: flex-start; /* top ෙකොරෙන් start */
+}
+
+/* Main content container */
+.app {
+  width: 100%;
+  max-width: 900px; /* desktop ේ 900px ට limit */
+}
+
+
+/* ================================================================
+   SECTION 4: HEADER
+================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* left + right edges */
+  margin-bottom: 12px;
+}
+
+.app-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.3px;
+}
+
+.header-date {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.progress-label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+
+/* ================================================================
+   SECTION 5: PROGRESS BAR
+   
+   "Track" = gray background bar
+   "Fill"  = green foreground bar (width JS ෙකොරෙන් set කරනවා)
+================================================================ */
+
+.progress-bar-track {
+  height: 5px;
+  background-color: var(--color-border);
+  border-radius: 99px; /* fully rounded ends */
+  margin-bottom: var(--gap-lg);
+  overflow: hidden; /* fill track ෙකොරෙන් outside ෙයන්නේ නැහැ */
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;                       /* JS ෙකොරෙන් update වෙනවා */
+  background-color: var(--color-progress);
+  border-radius: 99px;
+  transition: width 0.4s ease;    /* smooth animation */
+}
+
+
+/* ================================================================
+   SECTION 6: STATS GRID (4 cards)
+   
+   CSS Grid use කරනවා - 4 equal columns.
+================================================================ */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 equal columns */
+  gap: var(--gap-sm);
+  margin-bottom: var(--gap-lg);
+}
+
+/* Individual stat card */
+.stat-card {
+  background-color: var(--color-bg-col);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Color variants for stat values */
+.stat-value.green { color: var(--color-green-text); }
+.stat-value.amber { color: var(--color-amber-text); }
+.stat-value.red   { color: var(--color-red-text); }
+
+
+/* ================================================================
+   SECTION 7: ADD TASK FORM
+================================================================ */
+
+.add-form {
+  display: flex;
+  gap: var(--gap-sm);
+  flex-wrap: wrap;        /* mobile ේ wrap වෙනවා */
+  align-items: center;
+  background-color: var(--color-bg-app);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-bottom: var(--gap-lg);
+}
+
+/* Text inputs + select shared styles */
+.form-input,
+.form-select {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+/* Focus state - user click කරලා type කරන්න ready වෙනකොට */
+.form-input:focus,
+.form-select:focus {
+  border-color: var(--color-border-strong);
+}
+
+/* Task name input - wider */
+#task-input {
+  flex: 2;              /* available space ෙ 2x ගන්නවා */
+  min-width: 160px;
+}
+
+/* Date input - fixed narrow width */
+.date-input {
+  flex: 0;
+  min-width: 140px;
+}
+
+/* Select dropdowns */
+.form-select {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Add button */
+.btn-add {
+  height: 38px;
+  padding: 0 18px;
+  background-color: var(--color-text-primary);
+  color: var(--color-bg-app);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: opacity var(--transition);
+}
+
+.btn-add:hover {
+  opacity: 0.85;
+}
+
+
+/* ================================================================
+   SECTION 8: KANBAN BOARD
+   
+   3 equal columns - CSS Grid.
+   Each column = .kanban-col
+================================================================ */
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+  gap: var(--gap-md);
+}
+
+/* Individual column */
+.kanban-col {
+  background-color: var(--color-bg-col);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  min-height: 320px;
+}
+
+/* Column header (title + count badge) */
+.col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.col-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Task count pill/badge */
+.col-count {
+  font-size: 11px;
+  background-color: var(--color-bg-app);
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  padding: 1px 8px;
+  color: var(--color-text-secondary);
+}
+
+/* Empty state message */
+.empty-state {
+  text-align: center;
+  padding: 32px 0;
+  color: var(--color-text-hint);
+  font-size: 13px;
+}
+
+
+/* ================================================================
+   SECTION 9: TASK CARDS
+   
+   JS ෙකොරෙන් dynamically create කරලා column ට inject කරනවා.
+   (innerHTML use කරලා)
+================================================================ */
+
+.task-card {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+
+  /* Hover ේ ちょっと lift effect */
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.task-card:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Task title */
+.task-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+/* Badges row (priority + category + due date) */
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* Due date text - right side */
+.task-due {
+  font-size: 11px;
+  color: var(--color-text-hint);
+  margin-left: auto; /* right ට push කරනවා */
+}
+
+/* Overdue - red color */
+.task-due.overdue {
+  color: var(--color-red-text);
+  font-weight: 500;
+}
+
+/* Action buttons row */
+.task-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Small action buttons */
+.task-btn {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  background: transparent;
+  transition: background-color var(--transition);
+}
+
+.task-btn:hover {
+  background-color: var(--color-bg-col);
+}
+
+/* Delete button - red variant */
+.task-btn.delete {
+  color: var(--color-red-text);
+  border-color: #f0959580;
+}
+
+.task-btn.delete:hover {
+  background-color: var(--color-red-bg);
+}
+
+
+/* ================================================================
+   SECTION 10: BADGES
+   
+   Priority + Category labels.
+   Priority ට color, Category ට neutral style.
+================================================================ */
+
+/* Base badge style */
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 99px; /* pill shape */
+}
+
+/* Priority variants */
+.badge.high   { background-color: var(--color-red-bg);   color: var(--color-red-text); }
+.badge.medium { background-color: var(--color-amber-bg); color: var(--color-amber-text); }
+.badge.low    { background-color: var(--color-green-bg); color: var(--color-green-text); }
+
+/* Category badge - neutral */
+.badge.category {
+  background-color: var(--color-bg-col);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+
+/* ================================================================
+   SECTION 11: RESPONSIVE DESIGN
+   
+   @media query = screen size conditions.
+   "max-width: 640px" = screen ේ width 640px ට වඩා
+   අඩු වෙද්දී (mobile) ඒ styles apply කරනවා.
+================================================================ */
+
+@media (max-width: 640px) {
+
+  /* Page padding අඩු කරනවා mobile ේ */
+  .app-wrapper {
+    padding: 12px;
+  }
+
+  /* Stats: 2 columns (4 → 2) */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Kanban: single column (3 → 1) */
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
+
+  /* Form: stacked vertically */
+  .add-form {
+    flex-direction: column;
+  }
+
+  /* Full width inputs on mobile */
+  .form-input,
+  .form-select,
+  .btn-add {
+    width: 100%;
+    flex: unset;
+  }
+}

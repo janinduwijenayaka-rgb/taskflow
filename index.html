@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="si">
+
+  <head>
+    <!--
+    ============================================================
+      HEAD SECTION
+      - Browser tab eke title, character set, viewport settings
+      - External files (CSS, fonts) link කරනවා මෙතනින්
+    ============================================================
+    -->
+
+    <!-- Browser character encoding - Sinhala/Unicode support ට අවශ්‍ය -->
+    <meta charset="UTF-8">
+
+    <!-- Mobile phone වල හරියට පෙනෙන්න (responsive design) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Browser tab ේ පෙනෙන නම -->
+    <title>TaskFlow - Task Manager</title>
+
+    <!-- Google Fonts - අපේ custom font load කරනවා -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- අපේ CSS file link කරනවා (style.css) -->
+    <link rel="stylesheet" href="style.css">
+
+  </head>
+
+  <body>
+    <!--
+    ============================================================
+      BODY SECTION
+      - User ට පෙනෙන සියලු content මෙතන
+      - HTML tags = building blocks (div, h1, p, button, input...)
+      - class="..." = CSS style apply කරන්න
+      - id="..." = JavaScript ෙකොරෙන් element find කරන්න
+    ============================================================
+    -->
+
+    <!-- ===== MAIN APP WRAPPER ===== -->
+    <!-- සියලුම content wrap කරන outer container -->
+    <div class="app-wrapper">
+
+      <!-- ===== APP CONTAINER (max-width center) ===== -->
+      <div class="app">
+
+        <!-- ========================================
+          SECTION 1: HEADER
+          - App නම සහ දිනය පෙන්වනවා
+          - Progress percentage පෙන්වනවා
+        ======================================== -->
+        <header class="header">
+
+          <!-- Left side: Logo + date -->
+          <div class="header-left">
+            <h1 class="app-title">
+              <!-- ✓ icon (unicode character) -->
+              ✓ TaskFlow
+            </h1>
+            <!-- JavaScript ෙකොරෙන් දිනය මෙතන insert කරනවා -->
+            <p class="header-date" id="date-display"></p>
+          </div>
+
+          <!-- Right side: completion percentage -->
+          <!-- id="progress-label" → JS ෙකොරෙන් update කරනවා -->
+          <p class="progress-label" id="progress-label">0% complete</p>
+
+        </header>
+
+        <!-- Overall progress bar (done tasks / total tasks) -->
+        <div class="progress-bar-track">
+          <!-- width CSS property JS ෙකොරෙන් change වෙනවා -->
+          <div class="progress-bar-fill" id="global-progress"></div>
+        </div>
+
+
+        <!-- ========================================
+          SECTION 2: STATS CARDS (4 cards)
+          - Total, Done, In Progress, Overdue counts
+          - id ගොඩක් → JS ෙකොරෙන් numbers update කරනවා
+        ======================================== -->
+        <div class="stats-grid">
+
+          <div class="stat-card">
+            <p class="stat-label">Total tasks</p>
+            <!-- JS ෙකොරෙන් tasks.length මෙතන දානවා -->
+            <p class="stat-value" id="s-total">0</p>
+          </div>
+
+          <div class="stat-card">
+            <p class="stat-label">Done</p>
+            <p class="stat-value green" id="s-done">0</p>
+          </div>
+
+          <div class="stat-card">
+            <p class="stat-label">In progress</p>
+            <p class="stat-value amber" id="s-prog">0</p>
+          </div>
+
+          <div class="stat-card">
+            <p class="stat-label">Overdue</p>
+            <p class="stat-value red" id="s-over">0</p>
+          </div>
+
+        </div>
+
+
+        <!-- ========================================
+          SECTION 3: ADD TASK FORM
+          - User input fields (text, select, date)
+          - Button click → addTask() JS function call
+        ======================================== -->
+        <div class="add-form">
+
+          <!-- Task title input -->
+          <!-- id="task-input" → JS ෙකොරෙන් value ගන්නවා -->
+          <!-- onkeydown="..." → Enter key press වෙද්දී addTask() call කරනවා -->
+          <input
+            type="text"
+            id="task-input"
+            class="form-input"
+            placeholder="Task name..."
+            onkeydown="handleEnter(event)"
+          >
+
+          <!-- Priority dropdown -->
+          <select id="priority-select" class="form-select">
+            <option value="medium">🟡 Medium</option>
+            <option value="high">🔴 High</option>
+            <option value="low">🟢 Low</option>
+          </select>
+
+          <!-- Category dropdown -->
+          <select id="cat-select" class="form-select">
+            <option value="General">General</option>
+            <option value="Assignment">Assignment</option>
+            <option value="Project">Project</option>
+            <option value="Exam">Exam</option>
+            <option value="Personal">Personal</option>
+          </select>
+
+          <!-- Due date input -->
+          <input
+            type="date"
+            id="due-input"
+            class="form-input date-input"
+          >
+
+          <!-- Submit button → addTask() JS function call -->
+          <button class="btn-add" onclick="addTask()">
+            + Add task
+          </button>
+
+        </div>
+
+
+        <!-- ========================================
+          SECTION 4: KANBAN BOARD (3 columns)
+          - To Do | In Progress | Done
+          - Task cards JS ෙකොරෙන් dynamically add කරනවා
+        ======================================== -->
+        <div class="kanban-board">
+
+          <!-- COLUMN 1: TO DO -->
+          <div class="kanban-col">
+
+            <div class="col-header">
+              <span class="col-title">○ To do</span>
+              <!-- JS ෙකොරෙන් task count update කරනවා -->
+              <span class="col-count" id="count-todo">0</span>
+            </div>
+
+            <!-- Task cards JS ෙකොරෙන් මෙතන inject කරනවා (innerHTML) -->
+            <div class="col-body" id="col-todo"></div>
+
+          </div>
+
+          <!-- COLUMN 2: IN PROGRESS -->
+          <div class="kanban-col">
+
+            <div class="col-header">
+              <span class="col-title">◑ In progress</span>
+              <span class="col-count" id="count-prog">0</span>
+            </div>
+
+            <div class="col-body" id="col-prog"></div>
+
+          </div>
+
+          <!-- COLUMN 3: DONE -->
+          <div class="kanban-col">
+
+            <div class="col-header">
+              <span class="col-title">● Done</span>
+              <span class="col-count" id="count-done">0</span>
+            </div>
+
+            <div class="col-body" id="col-done"></div>
+
+          </div>
+
+        </div>
+        <!-- end kanban-board -->
+
+      </div>
+      <!-- end .app -->
+
+    </div>
+    <!-- end .app-wrapper -->
+
+
+    <!--
+    ============================================================
+      SCRIPT TAG - JavaScript file link කරනවා
+      IMPORTANT: Body ේ BOTTOM ට දානවා!
+      ඇයි? → HTML සියල්ල load වෙලා ඉවර වෙලා JS run වෙන්න
+      Top ට දැම්මොත් JS elements find කරන්න try කරනකොට
+      elements තාම exist නැති නිසා errors එනවා.
+    ============================================================
+    -->
+    <script src="script.js"></script>
+
+  </body>
+
+</html>
